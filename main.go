@@ -34,14 +34,14 @@ func main() {
 	renames := []rename{}
 
 	if !opts.NoDirs {
+		re := regexp.MustCompile(`^([^-]+\S)(?:-)(\S[^-]+)$`)
 		for _, dir := range dirs {
 			err := filepath.Walk(dir,
 				func(path string, info os.FileInfo, err error) error {
 					if err != nil {
 						return err
 					}
-					if info.IsDir() && info.Name() != "." && info.Name() != ".." && info.Name() != "albumart_backup" && strings.Contains(info.Name(), "_") {
-						re := regexp.MustCompile(`^([^-]+\S)(?:-)(\S[^-]+)$`)
+					if info.IsDir() && info.Name() != "." && info.Name() != ".." && info.Name() != "albumart_backup" {
 						groups := re.FindAllStringSubmatch(info.Name(), -1)
 						if len(groups) > 0 {
 							name := fmt.Sprintf("%s - %s", strings.ReplaceAll(groups[0][1], "_", " "), strings.ReplaceAll(groups[0][2], "_", " "))
@@ -61,6 +61,7 @@ func main() {
 	}
 
 	if !opts.NoFiles {
+		re := regexp.MustCompile(`^((\d{0,2})\.)(.*)\.(mp3)$`)
 		for _, dir := range dirs {
 			err := filepath.Walk(dir,
 				func(path string, info os.FileInfo, err error) error {
@@ -68,7 +69,6 @@ func main() {
 						return err
 					}
 					if info.Name() != "." && info.Name() != ".." {
-						re := regexp.MustCompile(`^((\d{0,2})\.)(.*)\.(mp3)$`)
 						groups := re.FindAllStringSubmatch(info.Name(), -1)
 						if len(groups) > 0 {
 							name := fmt.Sprintf("%s - %s.%s", groups[0][2], strings.ReplaceAll(groups[0][3], "_", " "), groups[0][4])
